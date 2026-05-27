@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Pensums Interactivos ITLA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+ --bg:#050510;
+ --card:#0b0b1f;
+ --lila:#c084fc;
+ --morado:#7c3aed;
+ --azul:#38bdf8;
+ --verde:#22c55e;
+}
+
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+}
+
+body{
+ min-height:100vh;
+ background:radial-gradient(circle at top,#0b0b2a,var(--bg));
+ font-family:'Poppins',sans-serif;
+ color:#e5e7eb;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:flex-start;
+ padding:20px;
+}
+
+header{
+ text-align:center;
+ margin-bottom:40px;
+ animation:fadeIn 0.8s ease-out;
+}
+
+header h1{
+ font-size:2.5rem;
+ font-weight:700;
+ background:linear-gradient(90deg,var(--lila),var(--azul),var(--verde));
+ -webkit-background-clip:text;
+ -webkit-text-fill-color:transparent;
+ margin-bottom:10px;
+}
+
+header p{
+ font-size:1.1rem;
+ opacity:0.9;
+ font-weight:300;
+}
+
+.carreras-grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+ gap:24px;
+ max-width:1200px;
+ width:100%;
+ animation:slideUp 0.8s ease-out 0.2s both;
+}
+
+.carrera-card{
+ background:linear-gradient(135deg,#0b0b2a,#1a1a3e);
+ border-radius:20px;
+ padding:28px;
+ cursor:pointer;
+ transition:all 0.3s ease;
+ border:2px solid transparent;
+ position:relative;
+ overflow:hidden;
+}
+
+.carrera-card::before{
+ content:'';
+ position:absolute;
+ inset:0;
+ border-radius:20px;
+ padding:2px;
+ background:linear-gradient(135deg,var(--lila),var(--azul));
+ -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;
+ mask-composite:exclude;
+ opacity:0;
+ transition:opacity 0.3s ease;
+}
+
+.carrera-card:hover::before{
+ opacity:1;
+}
+
+.carrera-card:hover{
+ transform:translateY(-8px) scale(1.02);
+ box-shadow:0 20px 60px rgba(124,58,237,0.4);
+}
+
+.carrera-card h2{
+ font-size:1.3rem;
+ color:var(--lila);
+ margin-bottom:8px;
+}
+
+.carrera-stats{
+ display:flex;
+ gap:16px;
+ margin-top:16px;
+ padding-top:16px;
+ border-top:1px solid rgba(192,132,252,0.2);
+}
+
+.stat{
+ flex:1;
+ text-align:center;
+}
+
+.stat-num{
+ display:block;
+ font-size:1.4rem;
+ font-weight:600;
+ color:var(--azul);
+}
+
+.stat-label{
+ font-size:0.75rem;
+ opacity:0.7;
+}
+
+/* 🔥 FOOTER CORREGIDO */
+footer{
+ max-width:900px;
+ margin-top:auto;
+ margin-bottom:40px;
+ text-align:center;
+ padding:20px;
+ color:#cfd8ff;
+ font-size:0.9rem;
+ opacity:0.6;
+}
+
+footer a{
+ color:#7dd3fc;
+ text-decoration:none;
+}
+
+footer a:hover{
+ text-decoration:underline;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn{
+ from{opacity:0;transform:translateY(-20px)}
+ to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes slideUp{
+ from{opacity:0;transform:translateY(40px)}
+ to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:768px){
+ header h1{font-size:2rem}
+ .carreras-grid{grid-template-columns:1fr;gap:16px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <h1>Pensums Interactivos ITLA</h1>
+ <p>• Instituto Tecnológico de Las Américas •</p>
+</header>
+
+<div class="carreras-grid">
+
+ <div class="carrera-card" onclick="irA('desarrollo-software.html')">
+  <h2>Desarrollo de Software</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">47</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">150</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('seguridad-informatica.html')">
+  <h2>Seguridad Informática</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">41</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">128</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('informatica-forense.html')">
+  <h2>Informática Forense</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">41</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">116</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('multimedia.html')">
+  <h2>Multimedia</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">55</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">151</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('redes-de-informacion.html')">
+  <h2>Redes de Información</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">45</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">141</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('ciencia-datos.html')">
+  <h2>Analítica y Ciencia de los Datos</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">38</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">105</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+ <div class="carrera-card" onclick="irA('diseño-industrial.html')">
+  <h2>Diseño Industrial</h2>
+  <div class="carrera-stats">
+   <div class="stat"><span class="stat-num">51</span><span class="stat-label">Materias</span></div>
+   <div class="stat"><span class="stat-num">162</span><span class="stat-label">Créditos</span></div>
+   <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+  </div>
+ </div>
+
+  <div class="carrera-card" onclick="irA('inteligencia-artificial.html')">
+    <h2>Inteligencia Artificial</h2>
+    <div class="carrera-stats">
+    <div class="stat"><span class="stat-num">40</span><span class="stat-label">Materias</span></div>
+    <div class="stat"><span class="stat-num">105</span><span class="stat-label">Créditos</span></div> 
+    <div class="stat"><span class="stat-num">6</span><span class="stat-label">Cuatrimestres</span></div>
+</div>
+</div>
+
+  
+<div class="carrera-card" onclick="irA('mecatronica.html')">
+    <h2>Mecatrónica</h2>
+    <div class="carrera-stats">
+    <div class="stat"><span class="stat-num">62</span><span class="stat-label">Materias</span></div>
+    <div class="stat"><span class="stat-num">181</span><span class="stat-label">Créditos</span></div> 
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+</div>
+</div>
+
+  <div class="carrera-card" onclick="irA('sonido.html')">
+    <h2>Sonido</h2>
+    <div class="carrera-stats">
+    <div class="stat"><span class="stat-num">42</span><span class="stat-label">Materias</span></div>
+    <div class="stat"><span class="stat-num">109</span><span class="stat-label">Créditos</span></div>
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+</div>
+</div>
+
+  <div class="carrera-card" onclick="irA('energias-renovables.html')">
+    <h2>Energías Renovables</h2>
+    <div class="carrera-stats">
+    <div class="stat"><span class="stat-num">45</span><span class="stat-label">Materias</span></div>
+    <div class="stat"><span class="stat-num">129</span><span class="stat-label">Créditos</span></div>
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+</div>
+</div>
+
+<div class="carrera-card" onclick="irA('videojuegos.html')">
+    <h2>Videojuegos</h2>
+    <div class="carrera-stats">
+    <div class="stat"><span class="stat-num">39</span><span class="stat-label">Materias</span></div>
+    <div class="stat"><span class="stat-num">105</span><span class="stat-label">Créditos</span></div>
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Cuatrimestres</span></div>
+</div>
+</div>
+
+</div>
+<footer>
+ <p>Hecho con amor por Aliandy Jimenez</p>
+ <p>LinkedIn: <a href="https://www.linkedin.com/in/aliandy-jim%C3%A9nez-595037318" target="_blank">Aliandy Jimenez</a></p>
+ <p>Instagram: <a href="https://www.instagram.com/aliandljimenez/" target="_blank">@aliandljimenez</a></p>
+ <p style="margin-top:8px;font-size:0.8rem">
+  Las mallas curriculares son referenciales. Verifica con tu coordinador académico.
+ </p>
+</footer>
+
+<script>
+function irA(url){
+ window.location.href = url;
+}
+
+function proximamente(){
+ alert('Esta carrera estará disponible próximamente 😊');
+}
+</script>
+
+</body>
+</html>

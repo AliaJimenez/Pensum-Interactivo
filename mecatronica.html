@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Pensum Interactivo • Mecatrónica ITLA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#050510;--card:#0b0b1f;--lila:#c084fc;--morado:#7c3aed;--azul:#38bdf8;
+ --A:#22c55e;--B:#60a5fa;--C:#fde047;--lock:#1e293b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#0b0b2a,var(--bg));font-family:'Poppins',sans-serif;color:#e5e7eb}
+header{text-align:center;padding:22px}
+header h1{margin:0;font-weight:600;background:linear-gradient(90deg,var(--lila),var(--azul));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:10px}
+.stat{background:#0b0b1f;padding:10px 16px;border-radius:14px;box-shadow:0 0 18px rgba(124,58,237,.25);font-size:.85rem}
+.progress-box{width:92%;margin:18px auto;background:#111132;border-radius:20px;overflow:hidden}
+.progress-bar{height:16px;width:0%;background:linear-gradient(90deg,var(--morado),var(--azul));transition:width .8s ease}
+.malla{display:flex;gap:18px;padding:18px;overflow-x:auto;scroll-snap-type:x mandatory}
+.cuatri{min-width:260px;background:linear-gradient(180deg,#0b0b2a,#050510);border-radius:22px;padding:14px;scroll-snap-align:start;box-shadow:0 0 30px rgba(124,58,237,.18)}
+.cuatri h2{text-align:center;font-size:.9rem;color:var(--lila);margin-bottom:6px}
+.cuatri .indiceC{font-size:.75rem;text-align:center;opacity:.85;margin-bottom:6px}
+.materia{margin:8px 0;padding:11px;border-radius:16px;background:var(--card);cursor:pointer;transition:.25s;position:relative;font-size:.85rem}
+.materia:hover{transform:scale(1.04);box-shadow:0 0 18px rgba(192,132,252,.35)}
+.materia.A{background:linear-gradient(135deg,#14532d,var(--A))}
+.materia.B{background:linear-gradient(135deg,#1e3a8a,var(--B))}
+.materia.C{background:linear-gradient(135deg,#713f12,var(--C));color:#111}
+.materia.bloqueada{background:var(--lock);opacity:.45;cursor:not-allowed;pointer-events:none}
+@media(max-width:600px){.cuatri{min-width:220px}header h1{font-size:1.2rem}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#0b0b1f;padding:22px;border-radius:20px;min-width:260px;text-align:center;box-shadow:0 0 40px rgba(124,58,237,.4)}
+.modal button{margin:8px;padding:8px 16px;border:none;border-radius:12px;font-family:'Poppins';cursor:pointer;background:var(--lila);color:#fff;font-weight:600}
+.modal button:hover{opacity:.9}
+.literales{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.btn-literal{width:60px;height:60px;font-size:1.4rem;font-weight:600;border-radius:14px;transition:.2s}
+.btn-literal:nth-child(1){background:linear-gradient(135deg,#14532d,var(--A));color:#fff}
+.btn-literal:nth-child(2){background:linear-gradient(135deg,#1e3a8a,var(--B));color:#fff}
+.btn-literal:nth-child(3){background:linear-gradient(135deg,#713f12,var(--C));color:#111}
+.btn-literal.btn-f{background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff}
+.btn-literal:hover{transform:scale(1.1);box-shadow:0 0 20px rgba(192,132,252,.5)}
+</style>
+</head>
+<body>
+<header>
+<h1>Pensum Interactivo • Tecnólogo en Mecatrónica</h1>
+<p>• Instituto Tecnologico de Las Americas •</p>
+<div class="stats">
+ <div class="stat">Índice General: <span id="indiceG">0.0</span></div>
+ <div class="stat">Materias: <span id="matProg">0/61</span></div>
+ <div class="stat">Créditos: <span id="credProg">0/181</span></div>
+</div>
+</header>
+<div class="progress-box"><div id="progress" class="progress-bar"></div></div>
+<section class="malla" id="malla"></section>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Nota final</h3>
+    <div class="literales">
+      <button class="btn-literal" onclick="seleccionarLiteral('A')">A</button>
+      <button class="btn-literal" onclick="seleccionarLiteral('B')">B</button>
+      <button class="btn-literal" onclick="seleccionarLiteral('C')">C</button>
+      <button class="btn-literal btn-f" onclick="seleccionarLiteral('F')">F</button>
+    </div>
+    <button onclick="borrarNota()" style="margin-top:10px;background:#dc2626">Borrar Nota</button>
+    <button onclick="cerrarModal()" style="margin-top:10px">Cancelar</button>
+  </div>
+</div>
+<script>
+// escala ITLA 4.0
+const escala=n=>n>=90?4:n>=80?3:n>=70?2:0;
+const letra=n=>n>=90?'A':n>=80?'B':n>=70?'C':'';
+
+// Convertir literal a nota numérica (punto medio del rango)
+const literalANota = {
+  'A': 95,  // 90-100
+  'B': 85,  // 80-89
+  'C': 75,  // 70-79
+  'F': 50   // 0-69
+};
+
+// Redondeo aritmético a 1 decimal
+const redondeoITLA = (num) => Math.round(num * 10) / 10;
+
+const cuatris=[
+{n:1,m:[{id:'HIS-101',n:'Historia Universal',c:3,pre:[]},
+        {id:'CAD-001',n:'Dibujo Técnico',c:4,pre:[]},
+        {id:'OAI-001',n:'Orientación Institucional',c:1,pre:[]},
+        {id:'MAT-001',n:'Precálculo',c:5,pre:[]},
+        {id:'ESP-101',n:'Redacción Castellana',c:4,pre:[]},
+        {id:'TI-101',n:'Fundamentos del Computador',c:4,pre:[]},
+        {id:'CBG-110',n:'Ética I',c:3,pre:[]},
+        {id:'ING-001',n:'Inglés Nivel 1-3',c:0,pre:[]}]},
+
+{n:2,m:[{id:'MAT-101',n:'Cálculo Diferencial',c:5,pre:['MAT-001']},
+        {id:'FIS-110',n:'Física General',c:4,pre:[]},
+        {id:'FIS-110-L',n:'Laboratorio Física General',c:1,pre:[]},
+        {id:'HIS-102',n:'Historia Dominicana',c:3,pre:['HIS-101']},
+        {id:'CAD-101',n:'Fundamentos de CAD',c:4,pre:['CAD-001']},
+        {id:'TMC-101',n:'Programación para Mecatrónicos',c:3,pre:['TI-101']},
+        {id:'DEP-101',n:'Educación Física',c:0,pre:[]},
+        {id:'TMC-100',n:'Ingenieria De Los Materiales Aplicada',c:3,pre:['MAT-001']},
+        {id:'CBG-115',n:'Ética II',c:3,pre:['CBG-110']},
+        {id:'ING-002',n:'Inglés Nivel 4-6',c:0,pre:['ING-001']}]},
+
+{n:3,m:[{id:'MAT-102',n:'Cálculo Integral',c:5,pre:['MAT-101']},
+        {id:'FIS-120',n:'Física Mecanica',c:4,pre:['FIS-110']},
+        {id:'FIS-120-L',n:'Laboratorio Física Mecanica',c:1,pre:['FIS-110']},
+        {id:'TMC-102',n:'Circuitos Electricos I',c:4,pre:['MAT-101']},
+        {id:'TMC-102-L',n:'Laboratorio Circuitos Electricos I',c:1,pre:['MAT-101']},
+        {id:'TMA-101',n:'Seguridad Industrial y Salud Ocupacional',c:3,pre:['MAT-101']},
+        {id:'CBG-120',n:'Ética III',c:3,pre:['CBG-115']},
+        {id:'CBG-210',n:'Probabilidad y Estadística',c:3,pre:['MAT-101']},
+        {id:'TMA-002',n:'Metrología',c:3,pre:['CAD-001','MAT-101']},
+        {id:'ING-003',n:'Inglés Nivel 7-9',c:0,pre:['ING-002']}]},
+
+{n:4,m:[{id:'TMC-103',n:'Circuitos Electricos II',c:4,pre:['TMC-102']},
+        {id:'TMC-103-L',n:'Laboratorio Circuitos Electricos II',c:1,pre:['TMC-102']},
+        {id:'TMC-201',n:'Electrónica I',c:4,pre:['TMC-102']},
+        {id:'TMC-201-L',n:'Laboratorio Electrónica I',c:1,pre:['TMC-102']},
+        {id:'TMC-202',n:'Electronica Digital',c:3,pre:['TMC-102']},
+        {id:'TMC-202-L',n:'Laboratorio Electronica Digital',c:1,pre:['TMC-102']},
+        {id:'TMC-200',n:'Estatica y Dinamica Aplicada',c:3,pre:['MAT-102','FIS-120']},
+        {id:'FIS-130',n:'Física Electrica',c:4,pre:['FIS-120']},
+        {id:'FIS-130-L',n:'Laboratorio Física Electrica',c:1,pre:['FIS-120']},
+        {id:'ING-004',n:'Inglés Nivel 10-12',c:0,pre:['ING-003']}]},
+
+{n:5,m:[{id:'TMC-203',n:'Electrónica II',c:3,pre:['TMC-201']},
+        {id:'TMC-203-L',n:'Laboratorio Electrónica II',c:1,pre:['TMC-201']},
+        {id:'TMC-212',n:'Sistemas Digitales',c:3,pre:['TMC-202']},
+        {id:'TMC-204',n:'Controles Automáticos I',c:4,pre:['TMC-201','TMC-103']},
+        {id:'TMC-302',n:'Instrumentación Industrial',c:4,pre:['TMC-201','TMC-103']},
+        {id:'CBG-215',n:'Metodología de la Investigación',c:3,pre:['CBG-210']},
+        {id:'ADM-200',n:'Administracion de Proyectos',c:2,pre:['CBG-210']},
+        {id:'CAD-102',n:'CAD Avanzado',c:4,pre:['CAD-101']},
+        {id:'ING-110',n:'Inglés Técnico',c:4,pre:['ING-004']}]},
+
+{n:6,m:[{id:'TMC-206',n:'Electrónica Industrial',c:3,pre:['TMC-203']},
+        {id:'TMC-206-L',n:'Laboratorio Electrónica Industrial',c:1,pre:['TMC-203']},
+        {id:'TMC-303',n:'Fundamentos de Máquinas Eléctricas',c:5,pre:['TMC-204']},
+        {id:'TMC-205',n:'Controles Automáticos II',c:4,pre:['TMC-204']},
+        {id:'TMC-207',n:'Microcontroladores',c:4,pre:['TMC-203','TMC-212']},
+        {id:'TMA-005',n:'Procesos de Manufactura',c:5,pre:['CAD-101','TMA-002']},
+        {id:'ADM-110',n:'Desarrollo de Emprendedores',c:3,pre:['CBG-215']},
+        {id:'TMC-301',n:'Sistemas de Control',c:5,pre:['TMC-203','TMC-204','TMC-302']}]},
+
+{n:7,m:[{id:'TMC-304',n:'Integración de Sistemas Mecatrónicos',c:3,pre:['TMC-205','TMC-303']},
+        {id:'TMC-306',n:'Robótica',c:4,pre:['TMC-206','TMC-207','TMC-301']},
+        {id:'TMC-305',n:'Redes de Comunicación Industrial',c:4,pre:['TMC-205','TMC-303']},
+        {id:'CBG-301',n:'Proyecto Final',c:3,pre:['TMC-206','TMC-207','TMC-301']},
+        {id:'TMA-301',n:'Programación Básica CNC',c:4,pre:['TMA-005']},
+        {id:'ADM-111',n:'Plan de Negocios',c:3,pre:['ADM-110']},
+        {id:'ELEC-1',n:'Electiva',c:3,pre:[]}]}];
+
+let estado=JSON.parse(localStorage.getItem('notas-mecatronica'))||{};
+let actual=null;
+const malla=document.getElementById('malla');
+
+// Función para verificar si una materia está bloqueada
+function estaBloqueada(materia) {
+  if (!materia.pre || materia.pre.length === 0) {
+    return false;
+  }
+  
+  for (let preId of materia.pre) {
+    const notaPre = estado[preId];
+    if (notaPre === undefined || notaPre === null || notaPre < 70) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+cuatris.forEach(c=>{
+ const box=document.createElement('div');
+ box.className='cuatri';
+ box.innerHTML=`<h2>${c.n}° Cuatrimestre</h2><div class='indiceC' id='ic-${c.n}'>Índice: 0.0</div>`;
+ c.m.forEach(m=>{
+  const d=document.createElement('div');
+  d.className='materia';
+  d.textContent=m.n;
+  d.dataset.id=m.id;
+  d.dataset.cred=m.c;
+  d.dataset.c=c.n;
+  box.appendChild(d);
+ });
+ malla.appendChild(box);
+});
+
+function render(){
+ let matOK=0,matTot=0,credOK=0,credTot=0,sumG=0,credG=0;
+ 
+ cuatris.forEach(c=>{
+  c.m.forEach(m=>{
+   matTot++;
+   credTot+=m.c;
+  });
+ });
+ 
+ cuatris.forEach(c=>{
+  let sumCuatri=0, credCuatri=0;
+  
+  c.m.forEach(m=>{
+   const nota=estado[m.id];
+   
+   if(nota!=null && nota>=70){
+    matOK++;
+    credOK+=m.c;
+   }
+   
+   if(nota!=null && m.c > 0){
+    const puntos = escala(nota) * m.c;
+    sumCuatri += puntos;
+    credCuatri += m.c;
+    sumG += puntos;
+    credG += m.c;
+   }
+  });
+  
+  const indiceCuatri = credCuatri > 0 ? redondeoITLA(sumCuatri / credCuatri).toFixed(1) : '0.0';
+  document.getElementById('ic-'+c.n).textContent='Índice: ' + indiceCuatri;
+ });
+ 
+ document.querySelectorAll('.materia').forEach(el=>{
+  const cnum=parseInt(el.dataset.c);
+  const cuatri=cuatris.find(x=>x.n==cnum);
+  const m=cuatri.m.find(x=>x.id===el.dataset.id);
+  const nota=estado[m.id];
+  
+  const bloqueado = estaBloqueada(m);
+  
+  el.className='materia';
+  if(bloqueado) {
+   el.classList.add('bloqueada');
+  }
+  if(nota!=null && nota>=70){
+   el.classList.add(letra(nota));
+  }
+  
+  el.replaceWith(el.cloneNode(true));
+ });
+ 
+ document.querySelectorAll('.materia').forEach(el=>{
+  const cnum=parseInt(el.dataset.c);
+  const cuatri=cuatris.find(x=>x.n==cnum);
+  const m=cuatri.m.find(x=>x.id===el.dataset.id);
+  const bloqueado = estaBloqueada(m);
+  
+  if(!bloqueado) {
+   el.addEventListener('click', function() {
+    actual=m.id;
+    document.getElementById('modalTitle').textContent=m.n;
+    document.getElementById('modal').style.display='flex';
+   });
+  }
+ });
+ 
+ document.getElementById('indiceG').textContent=credG ? redondeoITLA(sumG/credG).toFixed(1) : '0.0';
+ document.getElementById('matProg').textContent=`${matOK}/${matTot}`;
+ document.getElementById('credProg').textContent=`${credOK}/${credTot}`;
+ document.getElementById('progress').style.width=(credOK/credTot*100)+'%';
+}
+
+function seleccionarLiteral(literal){
+ const nota = literalANota[literal];
+ estado[actual] = nota;
+ localStorage.setItem('notas-mecatronica',JSON.stringify(estado));
+ document.getElementById('modal').style.display='none';
+ render();
+}
+
+function borrarNota(){
+ delete estado[actual];
+ localStorage.setItem('notas-mecatronica',JSON.stringify(estado));
+ document.getElementById('modal').style.display='none';
+ render();
+}
+
+function cerrarModal(){
+ document.getElementById('modal').style.display='none';
+}
+
+document.getElementById('modal').addEventListener('click', function(e){
+ if(e.target === this){
+  cerrarModal();
+ }
+});
+
+render();
+</script>
+</body>
+</html>
