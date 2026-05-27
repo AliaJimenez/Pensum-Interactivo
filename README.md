@@ -26,4 +26,4 @@ Si quieres clonar este proyecto y ejecutarlo en tu máquina local, sigue estos p
 
 1. **Clona el repositorio:**
 ```bash
-   git clone [(https://pensumsinteractivositla.netlify.app/)](https://pensumsinteractivositla.netlify.app/)
+   git clone https://pensumsinteractivositla.netlify.app/
